@@ -33,7 +33,10 @@ std::vector<int> GetOffsets()
 	vec.push_back(s.getoffsets("\x55\x8B\xEC\x51\xA1\x00\x00\x00\x00\x53\x8B\x5D\x08\x56", 14, ModulesNameEnum::CShell));
 	//Bh
 	vec.push_back(s.getoffsets("\x0F\xB6\x05\x00\x00\x00\x00\x8B\xCF\x50\x8D", 11, ModulesNameEnum::CShell)+0x3);
+	// CLTClient_this
+	vec.push_back(s.getoffsets("\x55\x8B\xEC\x51\x83\x3D\x00\x00\x00\x00\x00\x75\x11\x83\x3D", 15, ModulesNameEnum::Crossfire));
 	
+
 	return vec;
 }
 

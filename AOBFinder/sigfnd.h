@@ -24,10 +24,15 @@ public:
 
 	DWORD getoffsets(const char* pattern, int length, int moduleid)
 	{
-		auto ptr = FindPatternInModule(
+		auto ptr = FindPatternInModuleProtect(
 			CrtVec(pattern, length),
 			_modulesname[moduleid]
 		);
+
+		/*auto ptr = FindPatternInModule(
+			CrtVec(pattern, length),
+			_modulesname[moduleid]
+		);*/
 
 		f << ptr << "\n";
 

@@ -61,7 +61,49 @@ MODULEINFO GetModuleInfo(const char* szModule)
 	return modinfo;
 }
 
+PBYTE __FindPattern(
+	const std::vector<BYTE>& pattern, PBYTE start, PBYTE end
+)
+{
+	end -= pattern.size();
+	int endI = pattern.size() - 1;
+	int middle = endI / 2;
+	for (; start < end; start++)
+	{
+		if (!(start[0] == pattern[0] || (pattern[0] == 0x0))) continue;
+		if (!(start[middle] == pattern[middle] || (pattern[middle] == 0x0))) { start += middle; continue; }
+		if (!(start[endI] == pattern[endI] || (pattern[endI] == 0x0))) { start += endI; continue; }
+
+		if (__compare(pattern, start))
+		{
+			return start;
+		}
+		else
+		{
+			//start += endI;
+			start++;
+		}
+	}
+	return nullptr;
+}
+
 PBYTE FindPatternInModule(
+	std::vector<BYTE> pattern,
+	LPCSTR moduleName
+)
+{
+	HANDLE hProc = GetCurrentProcess();
+	MEMORY_BASIC_INFORMATION mbi;
+	SYSTEM_INFO si;
+	GetSystemInfo(&si);
+	MODULEINFO mInfo = GetModuleInfo(moduleName);
+	LPVOID lpMem = mInfo.lpBaseOfDll;
+	LPVOID   end = ((LPVOID)((DWORD)lpMem + mInfo.SizeOfImage));
+	return __FindPattern(pattern, (PBYTE)lpMem, (PBYTE)end);
+}
+
+
+PBYTE FindPatternInModuleProtect(
 	std::vector<BYTE> pattern,
 	LPCSTR moduleName,
 	DWORD startAdr, DWORD endAdr,
