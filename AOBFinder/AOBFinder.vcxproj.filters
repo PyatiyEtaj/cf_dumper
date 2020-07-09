@@ -18,9 +18,6 @@
     <ClInclude Include="framework.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="OffsEnum.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="ReaderWriterBin.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>

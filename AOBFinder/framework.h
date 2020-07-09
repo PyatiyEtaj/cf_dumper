@@ -25,3 +25,5 @@ PBYTE FindPatternInModule(
 	std::vector<BYTE> pattern,
 	LPCSTR moduleName
 );
+
+PBYTE FindPatternLight(std::vector<BYTE> pattern, LPCSTR moduleName);

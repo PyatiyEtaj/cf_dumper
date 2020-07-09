@@ -1,53 +1,65 @@
-﻿#include <iostream>
-#include <Windows.h>
+﻿#include <Windows.h>
+#include <iostream>
 
 using namespace std;
+
+#define WND_NAME "CROSSFIRE"
 
 inline HHOOK SetWndHook(int hookType, HMODULE h, LPCSTR funcName, DWORD thread)
 {
 	return SetWindowsHookEx(hookType, (HOOKPROC)GetProcAddress(h, funcName), h, thread);
 }
 
-BOOL SetHook(HMODULE pDll, LPCSTR wndName)
+// By Global HOOK
+HHOOK InstallHook(HMODULE pDll, LPCSTR wndName)
 {
-	DWORD threadId = GetWindowThreadProcessId(FindWindowA(NULL, wndName), NULL);
-	if (threadId == 0)
-	{
-		cerr << "window " << wndName << " doesn't running" << endl;
-		return FALSE;
-	}
+	HWND cfwnd = FindWindowA(NULL, wndName);
 
-	HHOOK hhook = SetWndHook(/*WH_GETMESSAGE*/WH_CALLWNDPROC, pDll, "HookProc", threadId);
+	HHOOK hhook = SetWndHook(5, pDll, "HookProc", 0);
 
 	if (GetLastError() != 0)
 	{
-		cerr << "something wrong --> " << GetLastError() << endl;
-		return FALSE;
+		string s = "something wrong --> " + GetLastError();
+		cout << s << endl;
+		return NULL;
 	}
 	cout << "HOOK " << hhook << " have setted" << endl;
+	SendMessage(cfwnd, WM_MOUSEMOVE, MK_LBUTTON, NULL);
 
-	//system("pause");
-	Sleep(5000);
-	if (hhook != NULL)
-	{
-		cout << "HOOK " << hhook << " released" << endl;
-		UnhookWindowsHookEx(hhook);
-	}
-	return TRUE;
+	return hhook;
 }
 
-void InjectCF()
+void InjectionGlobalHook()
 {
+	Sleep(10000);
+
 	HMODULE pDll = LoadLibraryA("AOBFinder.dll");
-	SetLastError(0);
-	BOOL res = SetHook(pDll, "CROSSFIRE");
-	cout << "RESULT : " << res << endl;
+	HHOOK hhk = InstallHook(pDll, WND_NAME);
+	if (hhk)
+	{
+		system("pause");
+		cout << "HOOK " << hhk << " released" << endl;
+		UnhookWindowsHookEx(hhk);
+	}
+	else
+		cout << "HOOK hasn't been setted" << endl;
+	system("pause");
 }
 
 int main()
 {
-	InjectCF();
-	//system("pause");
-	//system("pause");
+	//HWND hWnd = GetForegroundWindow();
+	while (true)
+	{
+		if (FindWindowA(NULL, WND_NAME)) {
+			InjectionGlobalHook();
+			break;
+		}
+
+		if (GetAsyncKeyState(VK_SPACE) & 1)
+			break;
+
+		Sleep(200);
+	}
 	return 0;
 }

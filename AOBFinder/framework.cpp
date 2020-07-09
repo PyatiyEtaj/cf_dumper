@@ -141,3 +141,30 @@ PBYTE FindPatternInModuleProtect(
 	}
 	return nullptr;
 }
+
+
+
+
+PBYTE __find(const std::vector<BYTE>& pattern, PBYTE start, PBYTE end)
+{
+	end -= pattern.size() + 1;
+	for (; start < end; start++)
+	{
+		if (__compare(pattern, start))
+			return start;
+	}
+	return nullptr;
+}
+
+
+PBYTE FindPatternLight(std::vector<BYTE> pattern, LPCSTR moduleName)
+{
+	HANDLE hProc = GetCurrentProcess();
+	MEMORY_BASIC_INFORMATION mbi;
+	SYSTEM_INFO si;
+	GetSystemInfo(&si);
+	MODULEINFO mInfo = GetModuleInfo(moduleName);
+	LPVOID start = mInfo.lpBaseOfDll;
+	LPVOID   end = (LPVOID)((DWORD)start + mInfo.SizeOfImage);
+	return __find(pattern, (PBYTE)start, (PBYTE)end);
+}
